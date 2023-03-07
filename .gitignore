@@ -6,6 +6,11 @@ __pycache__/
 #configs
 config/
 
+#quote_files
+quote.jpg
+quote.jpg.REMOVE_ME
+test_chatgpt.py
+
 # C extensions
 *.so
 
