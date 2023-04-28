@@ -10,6 +10,7 @@ config/
 quote.jpg
 quote.jpg.REMOVE_ME
 test_chatgpt.py
+script.bat
 
 # C extensions
 *.so

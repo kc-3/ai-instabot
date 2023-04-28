@@ -9,15 +9,19 @@ import json
 password = os.environ.get("insta_pass")
 openai.api_key = os.environ.get("OPEN_AI_KEY")
 
+# print(os.environ.get("OPEN_AI_KEY"))
+
 def generate_response(prompt):
     response = openai.Completion.create(
-        engine="text-davinci-003",
+        model="text-davinci-003",
         prompt=prompt,
-        max_tokens=2048,
+        max_tokens=200,
         n=1,
         stop=None,
-        temperature=0.5,
-        presence_penalty = 1.0,
+        top_p=1,
+        temperature=0.7,
+        presence_penalty = 2.0,
+        frequency_penalty = 2.0,
         # context = context,
         # id='fb3e8900-7180-4c91-bb09-a2910b45a7c9'
     )
@@ -31,10 +35,10 @@ prompt = '''You are an AI bot that has knowledge of various philosophical concep
             list of hastags that can maximize the reach of the post to various individuals.
             You will answer only in the following format.
 
-            Quote : [The_Quote] ,
-            Author : [The_Person_who_wrote_the_quote] ,
-            Caption : [Caption_for_the_quote] ,
-            Hashtags : [Hashtags_for_the_quote]
+            Quote: [The_Quote] |
+            Author: [The_Person_who_wrote_the_quote] |
+            Caption: [Caption_for_the_quote] |
+            Hashtags: [Hashtags_for_the_quote]
             
             '''
 
@@ -52,24 +56,27 @@ else:
 new_prompt = "give me a quote"
 new_prompt = f'{context} {new_prompt}'.strip()
 resp = generate_response(new_prompt)
-context["prompt"] += f"\n{resp}"
+
+
+# print(resp)
+
+# Extract the Quote
+quote = re.search(r'Quote: "(.*?)"\s*\|', resp).group(1)
+
+# Extract the Author
+author = re.search(r'Author: (.*?)\s*\|', resp).group(1)
+
+# Extract the Caption
+caption = re.search(r'Caption: (.*?)\s*\|', resp).group(1)
+
+# Extract the Hashtags
+hashtags = re.findall(r'#\w+', resp)
+
+context["prompt"] += f"\n{quote}"
 
 with open("context.json","w") as f:
     f.write(json.dumps(context))
     f.close()
-# print(resp)
-
-# Extract the Quote
-quote = re.search(r'Quote : "(.*?)"', resp).group(1)
-
-# Extract the Author
-author = re.search(r'Author : (.*?),', resp).group(1)
-
-# Extract the Caption
-caption = re.search(r'Caption : (.*?),', resp).group(1)
-
-# Extract the Hashtags
-hashtags = re.findall(r'#\w+', resp)
 
 print("Quote: ", quote)
 print("Author: ", author)
